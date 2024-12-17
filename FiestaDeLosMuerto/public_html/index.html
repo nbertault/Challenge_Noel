@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fiesta de los Muertos</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="connexionServeur.js"></script>
+        <link href="css/page_connexion.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <div class="container">
+            <form class="mt-5 was-validated">
+                <div class="row">
+                    
+                    <fieldset class="border border-dark rounded-3 col-2 p-4">
+                        <legend class="float-none w-auto px-3 ">Connexion</legend>
+                        <div>
+
+                            <input id="pseudo" placeholder="Sélectionnez votre pseudo" type="text" required="" >
+                            <br/><br/>
+                            <input  id="ip" placeholder="Sélectionnez l'ip du serveur" required="">
+                            <br/><br/>
+                            <label for="port">Sélectionnez votre port :</label>
+                            <br/>
+                            <input  type=number min="1024" max="9999" value="1234" class="example" name="text" required="">
+                            <br/>
+                            <br/>
+                            <br/>
+                            <button id="connect" type="submit">Connecter</button>
+                            <button id="disconnect" disabled>Déconnecter</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
