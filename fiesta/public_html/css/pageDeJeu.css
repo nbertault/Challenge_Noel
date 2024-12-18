@@ -1,0 +1,35 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : 18 déc. 2024, 10:42:13
+    Author     : mdeneau
+*/
+
+html, body{
+    align-items: center;
+    margin: 0;
+    height: 100%;
+    justify-content: center;
+    display: flex;
+}
+
+
+body{
+    background-size: 126%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('fondnoel.jpeg');
+    
+}
+
+fieldset{
+    background-image:  url('parcheminnoel.png');
+    position: absolute;
+    width: auto;
+    align-items: center;
+    color: white;
+    padding: 20px;
+    opacity: 0.8;
+}

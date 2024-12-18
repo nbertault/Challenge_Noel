@@ -1,0 +1,53 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : 18 déc. 2024, 09:34:23
+    Author     : mdeneau
+*/
+
+html, body{
+    align-items: center;
+    margin: 0;
+    height: 100%;
+    justify-content: center;
+    display: flex;
+}
+
+
+body{
+    background-size: 120%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('imagefond.jpg');
+    
+}
+
+fieldset{
+    position: absolute;
+    width: auto;
+    align-items: center;
+    color: white;
+    padding: 20px;
+    background: rgba(0,0,0,0.7);
+    max-width: 500px;
+    margin: 100px auto;
+    border-radius: 15px;
+    box-shadow: 0 0 15px;
+}
+
+fielset::after{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+button{
+    font-size: 21px;
+    border-radius: 15px;
+}
