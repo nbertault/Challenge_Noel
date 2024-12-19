@@ -72,11 +72,22 @@ void Serveur::onQWebSocketServerNewConnexion()
     connect(client, &QWebSocket::textMessageReceived,this, &Serveur::onQWebSocketTextMessageReceived);
     connect(client, &QWebSocket::disconnected,this, &Serveur::onQWebSocketDisconnected);
 
-    if (lesJoueurs.count() < 0) {
-        foreach (auto tousJoueurs , lesJoueurs) {
-            tousJoueurs->EnvoyerMessage('A', "Attente");
-        }
+    /* Version Sans Timer (perso) */
+    // if (lesJoueurs.count() < 0) {
+    //     foreach (auto tousJoueurs , lesJoueurs) {
+    //         tousJoueurs->EnvoyerMessage('A', "Attente");
+    //     }
+    // }
+
+    /* Version avec Timer (Monsieur GPT) */
+    if (lesJoueurs.count() > 3) {
+        QTimer::singleShot(5000, [&etat]() { // Timer de 5 secondes
+            etat = DEDUCTION;
+            qDebug() << "Etat changé à DEDUCTION.";
+        });
     }
+
+
     index++;
 }
 
@@ -112,31 +123,61 @@ void Serveur::onQWebSocketTextMessageReceived(const QString &msg)
 
     qDebug() << "Message Reçu" << msg << message.at(1) << message.at(2);
 
+    /* Code Perso */
+    // if(message.at(1) == 'C') {
+    //     bool pseudo = false;
 
-    if(message.at(1) == 'C') {
-        bool pseudo = false;
+    //     foreach (auto var,lesJoueurs) {
+    //         if(var->getPseudo() == message.at(2)) {
+    //             pseudo = true;
+    //         }
+    //     }
 
-        foreach (auto var,lesJoueurs) {
-            if(var->getPseudo() == message.at(2)) {
-                pseudo = true;
+    //     if(pseudo == false)
+    //         lesJoueurs.last()->setPseudo(message.at(2));
+    //     else {
+    //         QMessageBox::warning(this, "Erreur", "Pseudo invalide");
+    //         lesJoueurs.last()->EnvoyerMessage('E',"Pseudo invalide");
+    //     }
+
+    //     qDebug() << "Pseudo entré";
+
+    //     foreach (auto var,lesJoueurs) {
+    //         qDebug() << var->getPseudo();
+    //     }
+    // }
+
+    /* Code Monsieur GPT */
+    if (message.at(0) == 'C') {
+        bool pseudoExiste = false;
+        QString pseudoRecu = message.mid(2); // Récupération du pseudo après 'C:'
+
+        // Vérifier si le pseudo existe déjà
+        for (const auto& joueur : lesJoueurs) {
+            if (joueur->getPseudo() == pseudoRecu) {
+                pseudoExiste = true;
+                break;
             }
         }
 
-        if(pseudo == false)
-            lesJoueurs.last()->setPseudo(message.at(2));
-        else {
-            QMessageBox::warning(this, "Erreur", "Pseudo invalide");
-            lesJoueurs.last()->EnvoyerMessage('E',"Pseudo invalide");
+        // Attribuer le pseudo ou envoyer une erreur
+        if (!pseudoExiste) {
+            lesJoueurs.last()->setPseudo(pseudoRecu);
+            qDebug() << "Pseudo attribué:" << pseudoRecu;
+        } else {
+            QMessageBox::warning(nullptr, "Erreur", "Pseudo invalide");
+            lesJoueurs.last()->EnvoyerMessage('E', "Pseudo invalide");
         }
 
-        qDebug() << "Pseudo entré";
-
-        foreach (auto var,lesJoueurs) {
-            qDebug() << var->getPseudo();
+        // Afficher tous les pseudos
+        qDebug() << "Liste des pseudos actuels:";
+        for (const auto& joueur : lesJoueurs) {
+            qDebug() << joueur->getPseudo();
         }
     }
 
-    if (lesJoueurs.count() > 0 && etat == ATTENTE) {
+    if (etat == DEDUCTION) {
+
         qDebug() << "Début De Partie";
 
         QRandomGenerator gen;
@@ -178,26 +219,55 @@ void Serveur::onQWebSocketTextMessageReceived(const QString &msg)
         }
     }
 
+    /* Code perso */
+    // if (etat == DEDUCTION && tour < 4 && message.at(1) == 'P') {
 
-    if (etat == DEDUCTION && tour < 4 && message.at(1) == 'P') {
+    //     //tant que la liste ne contient pas tous les mots
+    //     while (listeMot.count() != lesJoueurs.count()) {
+    //         //ajout du mot dans la lsite
+    //         listeMot.append(message.at(2));
+    //         qDebug() << "Ajout à la liste de mot" << message.at(2);
 
-        //tant que la liste ne contient pas tous les mots
-        while (listeMot.count() != lesJoueurs.count()) {
-            //ajout du mot dans la lsite
-            listeMot.append(message.at(2));
-            qDebug() << "Ajout à la liste de mot" << message.at(2);
+    //         //pour chaque joueur envoyer le mot correspondant
+    //         foreach (auto personnage , lesJoueurs) {
+    //             personnage->EnvoyerMessage('M', listeMot.at(personnage->getIndex()));
+    //         }
+    //     }
+    //     tour++;
+    // }
 
-            //pour chaque joueur envoyer le mot correspondant
-            foreach (auto personnage , lesJoueurs) {
-                personnage->EnvoyerMessage('M', listeMot.at(personnage->getIndex()));
+    // if (tour == 4)
+    // {
+    //     etat = FIN;
+    // }
+
+    /* Code Monsieur GPT */
+    while (etat == DEDUCTION && tour < 4) {
+        // Vérification du type de message
+        if (message.at(0) == 'P') {
+            QString motRecu = message.mid(2); // Récupération du mot après 'P:'
+
+            // Tant que la liste ne contient pas tous les mots
+            while (listeMot.count() < lesJoueurs.count()) {
+                // Ajouter le mot dans la liste
+                listeMot.append(motRecu);
+                qDebug() << "Ajout à la liste de mots:" << motRecu;
+
+                // Pour chaque joueur, envoyer le mot correspondant
+                for (auto personnage : lesJoueurs) {
+                    int indexSuivant = (personnage->getIndex() + tour) % lesJoueurs.count();
+                    personnage->EnvoyerMessage('M', listeMot.at(indexSuivant));
+                }
             }
-        }
-        tour++;
-    }
 
-    if (tour == 4)
-    {
-        etat = FIN;
+            // Passer au tour suivant
+            tour++;
+        }
+
+        // Vérifier si le jeu est terminé
+        if (tour == 4) {
+            etat = FIN;
+        }
     }
 
     if(etat == FIN) {
@@ -242,14 +312,14 @@ void Serveur::onQWebSocketTextMessageReceived(const QString &msg)
     // case ECHANGE_PROPOSITION:
     //     if(message.at(1) == 'P') {
 
-    //     }
-    //     break;
-    // case DEDUCTION:
-    //         EnvoyerMessage('D', "Attente");
-    //     break;
-    // case CALCUL_SCORE:
-    //     break;
-    // case RECONNEXION:
-    //     break;
-    // }
+        //     }
+        //     break;
+        // case DEDUCTION:
+        //         EnvoyerMessage('D', "Attente");
+        //     break;
+        // case CALCUL_SCORE:
+        //     break;
+        // case RECONNEXION:
+        //     break;
+        // }
 }
